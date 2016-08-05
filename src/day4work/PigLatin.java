@@ -6,125 +6,74 @@ import java.lang.StringBuilder;
 public class PigLatin {
 
 	public static void main(String[] args) {
-		String userInput = getUserInput();
-		translator(userInput);
+		String userInput = getUserInput(); //call getUserInput method and store in new String variable userInput
+		translator(userInput); //call translator method and pass in userInput collected by getUserInput method
 	}
 	
-	public static String getUserInput(){
+	//method to prompt user for input from keyboard and store in userInput variable
+	public static String getUserInput(){ 
 		String userInput = null;
 		
 		Scanner sc = new Scanner(System.in);
 		
 		System.out.println("Enter your phrase to be translated to Pig Latin:");
-		userInput = sc.nextLine();
+		userInput = sc.nextLine(); //store keyboard input in userInput
 		sc.close();
 		return userInput;
 	}
 
+	//method to be passed a phrase, split into individual words then passed to translator method
 	public static void translator(String phraseToBeTranslated){
 		String phrase = phraseToBeTranslated;
-		String[] words = phrase.split("\\s");
+		String[] words = phrase.split("\\s"); //split phrase entered into array of individual words
 		
-		for(int i=0; i<words.length; i++){
-			System.out.println(words[i]);
-		}
-		
-		for(int i=0; i<words.length; i++){
+		for(int i=0; i<words.length; i++){ //translate each individual word
 			System.out.print(translateWord(words[i]) + " ");
 		}
 		
 	}
 	
+	//accept word, translate to Pig Latin and return translated word
 	public static String translateWord(String wordToBeTranslated){
 		String word = wordToBeTranslated;
 		String pigLatin = null;
 		int length = word.length();
-		char firstLetter;
-		char secondLetter;
-		char[] tempArray = new char[length+4];
-		
 		StringBuilder sb = new StringBuilder(word);
-		firstLetter = sb.charAt(0);
-		if (word.length() == 1){
-			tempArray[0] = firstLetter;
-			tempArray[length] = '-';
-			tempArray[length+1] = 'y';
-			tempArray[length+2] = 'a';
-			tempArray[length+3] = 'y';
-			pigLatin = new String(tempArray);
-		}else{
-			secondLetter = sb.charAt(1);
+		boolean alterWord = true;
 		
-			if (isVowel(firstLetter) == false){
-				if(isVowel(secondLetter) == true){
-					sb.deleteCharAt(0);//delete first character in string builder
-					//transfer remaining characters to a char array
-					for(int i=0; i<length-1; i++){
-						tempArray[i] = sb.charAt(i);
+		if(isVowel(sb.charAt(0))){//if the first character is a vowel, add -yay to end and store in variable pigLatin
+			pigLatin = (sb.toString() + "-yay");
+		}else{//if the first character is not a vowel (its a consonant) 
+			for (int i=0; i<length; i++){//go through word, find first vowel
+				char firstLetter = sb.charAt(i);//store first letter in char variable
+				if(isVowel(firstLetter)){//if we reach a vowel, we're finished
+					pigLatin = (sb.toString() + "ay");//add ay and store in pigLatin
+					break;
+				}
+				else{
+					if(alterWord){
+						sb.append('-');//add the dash only once
+						alterWord = false;
 					}
-					tempArray[length-1] = '-';
-					tempArray[length] = firstLetter;
-					tempArray[length+1] = 'a';
-					tempArray[length+2] = 'y';
-					pigLatin = new String(tempArray);
-				}else{
-					pigLatin = constCluster(word);
+					sb.append(firstLetter);//add first letter to the end
+					sb.deleteCharAt(i);//delete first character
+					i--;//reset iterations now that the first character in StringBuilder was removed
 				}
-		
-			}else {
-				for (int i=0; i<length; i++){
-					tempArray[i] = sb.charAt(i);
-				}
-				tempArray[length] = '-';
-				tempArray[length+1] = 'y';
-				tempArray[length+2] = 'a';
-				tempArray[length+3] = 'y';
-				pigLatin = new String(tempArray);
 			}
 		}
-		return pigLatin;
+		return pigLatin; //return translated word
 	}
 	
+	//method to check if a character is a vowel
 	public static boolean isVowel(char first){
-		boolean isVowel = false;
+		boolean isVowel = false;//default value is false
 		char letter = Character.toLowerCase(first);
 		char[] vowels = {'a','e','i','o','u'};
 		for (int i=0; i<vowels.length; i++){
-			if(vowels[i]==letter){
+			if(vowels[i]==letter){//if the letter matches any of the characters stored in vowels array, set isVowel to true;
 				isVowel = true;
 			}
 		}
 		return isVowel;
-	}
-	
-	public static String constCluster(String wordToBeTranslated){
-		int length = wordToBeTranslated.length();
-		String word = wordToBeTranslated;
-		String pigLatin = null;
-		StringBuilder sb = new StringBuilder(word);
-		String beginning = Character.toString(sb.charAt(0));
-		String ending = null;
-		int counter = 1;
-		
-		for (int i=1; i<length; i++){
-			if(isVowel(sb.charAt(i))){
-				ending = Character.toString(sb.charAt(i));
-				break;
-			}else{
-				beginning = beginning + Character.toString(sb.charAt(i));
-				counter++;
-			}
-		}
-		
-		for (int i=counter+1; i<length; i++){
-			ending = ending + Character.toString(sb.charAt(i));
-		}
-		
-		//Construct pigLatin
-		//String beginning = new String(firstPart);
-		pigLatin = (ending + '-' + beginning + "ay");
-	
-		
-		return pigLatin;
 	}
 }
